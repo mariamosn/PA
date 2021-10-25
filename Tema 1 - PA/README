@@ -1,0 +1,140 @@
+Maria Moșneag
+323CA
+Tema1 PA
+Aprilie 2021
+
+1. crypto: Gigel și criptomonedele
+
+	Pentru a rezolva problema, realizez o căutare binară pe mulțimea valorilor
+ce reprezintă numărul de monede ce ar putea fi minate într-o oră (adică mulțimea
+numerelor naturale de la 1 la PMAX = 10^9). Căutarea binară este implementată
+prin intermediul funcției find_best_p, dar în loc să caut o valoare predefinită,
+caut cea mai mare valoare pentru care costul update-urilor se încadrează în bu-
+get. Calcularea costului la fiecare pas se face cu ajutorul funcției get_cost
+care parcurge perechile (Pi, Ui) primite de la input.
+
+	Complexități:
+		+ temporale
+		get_cost: O(n), întrucât sunt parcurse toate cele n perechi
+		find_best_p: O(n * log n), deoarece complexitatea căutării binare este
+								   O(log n), iar la fiecare pas este apelată
+								   funcția get_cost ce are complexitatea O(n)
+		totală: O(n * log n)
+		+ spațială: O(n) -> v
+		n = numărul de calculatoare
+
+	Înainte de a găsi această variantă mai eficientă de rezolvare, am încercat
+alta ce presupunea sortarea lui v în funcție de Pi urmată de parcurgerea valori-
+lor și prelucrarea acestora până la obținerea rezultatului final. Dar, deși com-
+plexitatea acestei abordări era tot O(n * log n) (O(n * log n) sortarea și O(n)
+parcurgerea), soluția nu se încadra în limitele de timp impuse.
+
+2. stocks: Gigel investește la bursă
+
+	Rezolvarea acestei probleme se bazează pe programarea dinamică. Pentru a-
+ceasta am folosit o matrice dp, de dimensiuni l x b, unde l reprezintă pierderea
+maximă acceptată, iar b bugetul și fiecare câmp dp[i][j] reprezintă profitul
+maxim ce se poate obține cu o pierdere potențială de cel mult i și cu un cost
+mai mic sau egal cu j.
+	Am parcurs acțiunile rând pe rând, actualizând matricea dp la fiecare pas.
+Pentru aceasta, verific dacă profitul este mai mare în cazul în care acțiunea
+curentă este cumpărată decât înainte.
+	La final, rezultatul se găsește în dp[l][b], întrucât noi doream să găsim
+profitul maxim posibil, astfel încât pierderea potențială să fie maxim l și bu-
+getul nostru fiind b.
+
+	Complexități:
+		+ temporale
+		update_dp: O(l * b)
+				-> O(l * b) memorarea informației de la pasul anterior
+				-> O(l * b) actualizarea lui dp, întrucât în cel mai defavorabil
+							caz este nevoie să parcurgem întreaga matrice
+		totală: O(n * l * b), întrucât pentru fiecare dintre cele n acțiuni se
+							  apelează update_dp
+		+ spațială: O(l * b) -> dp, prev
+		l = pierderea potențială maximă
+		b = buegtul
+		n = numărul de acțiuni
+
+3. valley: Gigel merge la munte
+
+	Pentru această problemă am construit matricea dp, în care dp[0][i] reprezin-
+tă numărul de ore necesar pentru a obține un prefix între 0 și i, iar dp[1][i]
+cel pentru obținerea unui sufix între i și n - 1. Prin adunarea dp[0][i] și
+dp[1][i] (și efectuarea unor mici ajustări astfel încât să nu contorizăm orele
+petrecute săpând vârful i de mai multe ori sau să considerăm că vârful i are do-
+uă înălțimi diferite simultan) obținem numărul total de ore necesare pentru a
+obține o vale cu cel mai jos punct în vârful i. Determinând minimul dintre aces-
+te valori, obținem răspunsul dorit.
+	
+	Complexități:
+		+ temporale
+		calculul lui dp[0][] -> O(n), întrucât vectorul cu înălțimi este parcurs
+									  o singură dată
+		calculul lui dp[1][], al totalului și al răspunsului final -> O(n)
+		totală: O(n)
+		+ spațială: O(n) -> v, aux, dp
+		n = numărul de vârfuri
+
+4. ridge: Gigel și creasta montană
+
+	Rezolvarea acestei probleme constă în parcurgerea rând pe rând a munților și
+construirea unei matrice dp[3][2] care să fie actualizată la fiecare pas. În dp,
+prima coloană conține informații referitoare la starea crestei până la muntele
+precedent inclusiv, iar în cea de-a doua este calculată la fiecare pas informa-
+ția despre creasta care include și muntele curent. Astfel, în dp[1][i] se va gă-
+si prețul obținerii unei creste de la primul munte până la cel curent, conside-
+rând că din cel curent tăiem i. Astfel, rezultatul dorit va fi obținut prin de-
+terminarea valorii minime de pe o coloană, după procesarea datelor despre toți
+munții.
+	Cazurile pe care are sens să le analizăm sunt cele în care dintr-un munte
+tăiem 0, 1, respectiv 2, știind că pentru a obține o înățime diferită de cele
+ale vecinilor nu este nevoie să tăiem mai mult.
+	Modul de determinare a unei valori din coloana corespunzătoare muntelui cu-
+rent este prin adunarea valorii minime de la pasul precedent cu costul tăierii
+din muntele curent, având însă grijă să nu obținem înălțimi egale sau o înălțime
+negativă.
+
+	Complexități:
+	+ temporale
+	update_dp: O(1), întrucât se parcurge de 3 ori prima coloană a matricei pen-
+					 tru calcularea valorilor din a doua coloană, iar apoi se
+					 copiază informația din a doua coloană în prima, dar matri-
+					 cea are dimensiuni constante și reduse (3 x 2) în compara-
+					 ție cu volumul datelor de intrare
+	totală: O(n), deoarece sunt parcurși toți cei n munți
+	+ spațială: O(1) -> dp[3][2]
+	n = numărul de munți
+
+5. trigigel: Trigigel
+
+	Inițial am abordat o rezolvare ce se baza pe o matrice dp, în care dp[i][j]
+reprezenta numărul de moduri în care se poate obține un subșir care să se termi-
+ne cu i % 3, folosind indici mai mici sau egali cu j. Această soluție însă nu se
+încadra în limita de timp, nici după mai multe optimizări.
+	Am încercat apoi să determin o recurență liniară, astfel încât să pot folosi
+exponențierea pe matrice. Recurența găsită a fost:
+	dp[i] = 2 * dp[i - 1] - dp[i - 2] + dp[i - 3] - dp[i - 4], unde dp[i] repre-
+zintă numărul de subșiruri care să se termine cu (i - 1) % 3 și care să fie for-
+mate folosind indici mai mici sau egali cu i.
+	Am aflat așadar matricea C.
+	Apoi, am calculat valorile dp[1], ..., dp[4], aflând așadar și vectorul S4.
+	Calculul lui C^(n - 4) l-am făcut cu ajutorul funcției matrix_pow și
+matrix_multiply a căror implementare a fost (puternic) inspirată de cea din la-
+boratorul 2 de PD.
+	Rezultatul dorit se obține prin adunarea ultimelor 3 valori din vectorul re-
+zultat din înmulțirea S4 cu C^(n - 4), întrucât cele 3 valori reprezintă numărul
+de subșiruri posibile care să se termine cu 0, cu 1, respectiv cu 2 (nu neapărat
+în această ordine), pornind de la un șir de lungime n.
+
+	Complexități:
+	+ temporale
+	matrix_multiply: O(KMAX ^ 3 + KMAX ^ 2) = O(4 ^ 3) = O(1)
+	matrix_pow: O(log pow) = O(log (n - 4)) = O(log n)
+	totală: O(log n), întrucât cea mai costisitoare operație este calcularea lui
+					  C^(n - 4), celelalte operații fiind făcute în timp con-
+					  stant
+	+ spațială: O(1), întrucât toate tablourile folosite au dimensiuni constan-
+					  te, ce nu depid de n și sunt semnificativ mai mici față de
+					  acesta
+	n = lungimea șirului

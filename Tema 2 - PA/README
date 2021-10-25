@@ -1,0 +1,152 @@
+Maria Moșneag
+323CA
+Tema 2 - Proiectarea Algoritmilor
+
+Poduri
+
+	Pentru rezolvarea problemei am folosit o matrice auxiliară (d), în cadrul
+căreia o celulă va fi 0 dacă poziția corespunzătoare nu a fost parcursă încă,
+respectiv numărul minim de poduri (+ 1) care au fost traversate de la poziția i-
+nițială a lui Gigel până la poziția indicată de celulă. Soluția problemei va fi
+așadar reprezentată de prima valoare (- 1) ce va fi "scrisă" în afara limitelor
+matricei.
+	Pentru a construi structura anterior menționată am folosit o parcurgere bfs
+aplicată pe graful format pe baza gridului primit la input. În acest graf, con-
+sider că fiecare poziție reprezintă un nod, iar nodul A este adiacent cu nodul B
+dacă este respectată una dintre următoarele condiții:
+	- B este la nord sau la sud de A și în A există un pod vertical sau dublu
+	- B este în estul sau în vestul lui A și în A există un pod orizontal sau
+	  dublu
+	Parcurgerea se oprește în momentul în care ajungem la o poziție din afara
+limitelor gridului (dacă acest lucru este posibil) sau după ce am parcurs toate
+pozițiile accesibile.
+
+	Complexitate:
+	+ temporală
+		În cel mai defavorabil caz, este necesar să parcurgem tot gridul, deci
+	complexitatea va fi O(n * m).
+	+ spațială
+		O(n * m): bridges și d sunt ambele n x m
+
+	n = numărul de linii ale gridului
+	m = numărul de coloane
+
+
+Adrese
+
+	Pentru rezolvarea acestei probleme am folosit mai multe structuri de date
+auxiliare, dintre care cele mai importatne sunt:
+	- vector<string> people:
+		Fiecărei persoane din input i se atribuie câte un ID, un număr de la 0
+		la n, fiind respectată ordinea inițială. Astfel, people[x] va conține
+		numele persoanei x + 1 din input.
+	- unordered_map<string, vector<int>> mail_to_ids:
+		Fiecare adresă de mail va fi mapată către o listă de ID-uri.
+	- vector<int> adj[n + 1]:
+		Va fi folosit pentru a reține "legăturile" din cadrul grafului în care
+		fiecare nod reprezintă id-ul unei persoane din lista inițială, iar nodul
+		cu ID A are legătură cu nodul cu ID B numai dacă persoana A și B au cel
+		puțin o adresă de mail comună.
+	- vector<int> final_people:
+		Va conține lista ID-urilor unor persoane unice, cele cu numele cel mai
+		potrivit (cel mai mic din punct de vedere lexicografic) pentru a unifica
+		toate adresele de mail ale unui om.
+	- unordered_map<int, vector<string>> id_and_mails:
+		Mapează fiecărui ID din final_people lista de mailuri corespunzătoare.
+
+	Pe măsură ce citesc datele de la input, construiesc vectorul people și
+map-ul mail_to_ids.
+	Parcurg apoi lista tuturor mail-urilor și construiesc graful de ID-uri re-
+prezentat cu ajutorul vectorului adj.
+	Folosesc apoi parcurgeri bfs pentru a găsi componentele conexe din graful
+anterior menționat. O componentă conexă este formată din toate ID-urile unei
+persoane unice. Concomitent cu aceste parcurgeri, determin și cel mai potrivit
+nume pentru o persoană. Acesta este numele ce va fi adăugat în final_people și
+la care se va mapa ulterior lista de mail-uri. De asemenea, pentru ușurință,
+după ce găsesc toate nodurile care fac parte dintr-o componentă conexă, marchez
+în vectorul rep "root-ul" componentei (id-ul celui cu numele potrivit) pentru
+fiecare membru al componentei în parte.
+	Parcurg iar lista de mail-uri și, pe baza vectorului rep, adaug fiecare a-
+dresă în lista corespunzătoare din id_and_mails.
+	Sortez lista de nume după numărul de mail-uri și criteriul lexicografic, a-
+poi, pentru fiecare persoană în parte, sortez lexicografic și lista de adrese.
+
+	Complexitate:
+	+ temporală
+		- construirea people: O(n)
+		- construirea mail_to_ids: O(n * k) sau O(m)
+		- construirea grafului: O(n * k) sau O(m)
+		- determinarea componentelor conexe: O(n)
+		- construirea id_and_mails: O(n * k) sau O(m)
+		- sortarea listei de nume: O(n * log n)
+		- sortarea listelor de mail-uri: O(n * k * log k)
+		Așadar, complexitatea totală este O(n * k * log k).
+	+ spațială
+		O (max(n * n, m))
+
+	n = numărul de persoane
+	k = numărul maxim de adrese de mail ale unei persoane
+	m = numrul de adrese de mail
+
+
+Lego
+
+	Am general toate grupurile posibile de n piese diferite, de dimensiune ma-
+ximă k (combinări de k luate câte n) folosind backtracking. Apoi, pentru fiecare
+variantă generată, am determinat numărul de dimensiuni consecutive care se pot
+obține. Dacă numărul obținut este mai mare decât cel curent (best_cnt), actuali-
+zez best_cnt și memorez grupul curent de piese.
+	Pentru a determina numărul de piese consecutive folosesc funcția auxiliară
+get_cnt. În cadrul acesteia folosesc vectorul sums pentru a determina ce piese
+se pot obține. sums[i] va fi 0 dacă nu se poate obține o piesă de dimensiune i,
+respectiv numărul minim de piese din care se poate obține altfel. Pentru a con-
+strui sums, iau rând pe rând câte o piesă din grupul generat și actualizez sums
+de la pasul anterior, ținând cont de faptul că numărul de piese total nu trebuie
+să depășească t.
+	Apoi parcurg sums și determin lungimea maximă a unei secvențe de dimensiuni
+consecutive ce se pot obține.
+	
+	Complexitate:
+	+ temporală
+		- backtracking: O(Combinări(k, n))
+		- get_cnt: O(Combinări(k, n) * t * k)
+		=> O(Combinări(k, n) * t * k)
+	+ spațială
+		- backtraking: O(k)
+		- get_cnt: O(t * k)
+		=> O(t * k)
+
+	k = dimensiunea maximă a unei piese
+	n = numărul de piese diferite
+	t = numărul maxim de piese
+
+
+Rețea
+
+	Construiesc un graf neorientat în care fiecare computer reprezintă un nod.
+Apoi consider, rând pe rând, că dispare câte un calculator din rețea și, pentru
+fiecare, calculez numărul de apeluri dispărute. Pentru aceasta, am observat că,
+dacă un nod nu este punct de articulație, apelurile care dispar sunt numai cele
+din care făcea el parte. Astfel, în acest caz, numărul căutat va fi 2 * (n - 1),
+unde n este numărul total de persoane. În schimb, dacă nodul este punct de arti-
+culație, nu se va mai putea efectua niciun apel de la un membru al unei noi com-
+ponente conexe către un membru al unei alte componente.
+	Utiliez așadar algoritmul Tarjan CV (preluat din rezolvarea laboratorului 8)
+pentru a determina nodurile care sunt puncte de articulație. Este necesar să a-
+flu numărul de membrii din fiecare nouă componentă conexă. Pentru aceasta, folo-
+sesc parcurgeri bfs.
+	
+	Complexitate:
+	+ temporală
+		- Tarjan CV: O(n + m)
+		- determinarea numărului de apeluri dispărute pentru un nod șters: O(n)
+		- determinarea numerelor dorite pentru toate nodurile: O(n^2)
+		=> total: O(n^2)
+
+	+ spațială
+		- Tarjan CV: O(n)
+		- parcurgere bfs: O(n)
+		=> total: O(n)
+
+	n = numărul de noduri
+	m = numărul de muchii
